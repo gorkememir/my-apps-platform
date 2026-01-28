@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Chess Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .login-box {
+      background: white;
+      padding: 3rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    h1 { color: #333; margin-bottom: 2rem; }
+    .google-btn {
+      background: #4285F4;
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+    .google-btn:hover {
+      background: #357ae8;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h1>♟️ Chess Game</h1>
+    <p>Login to play multiplayer chess</p>
+    <a href="/auth/google" class="google-btn">Sign in with Google</a>
+  </div>
+</body>
+</html>

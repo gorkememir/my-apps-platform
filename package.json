@@ -1,0 +1,23 @@
+{
+  "name": "my-apps-platform",
+  "version": "1.0.0",
+  "description": "A platform of free apps - habits, chess, and more",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "platform-web"
+  ],
+  "scripts": {
+    "install": "npm install",
+    "habit:dev": "npm run start --workspace=apps/habit-tracker",
+    "chess:dev": "npm run start --workspace=apps/chess-game",
+    "platform:dev": "npm run start --workspace=platform-web",
+    "dev:all": "concurrently \"npm run habit:dev\" \"npm run chess:dev\" \"npm run platform:dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "",
+  "license": "MIT"
+}

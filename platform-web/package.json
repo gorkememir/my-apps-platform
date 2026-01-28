@@ -1,0 +1,19 @@
+{
+  "name": "platform-web",
+  "version": "1.0.0",
+  "description": "Platform landing page",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^3.1.9"
+  },
+  "keywords": [
+    "platform",
+    "landing"
+  ],
+  "author": "",
+  "license": "MIT"
+}

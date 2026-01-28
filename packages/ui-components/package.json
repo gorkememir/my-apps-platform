@@ -1,0 +1,6 @@
+{
+  "name": "@my-platform/ui-components",
+  "version": "1.0.0",
+  "description": "Shared UI components for all apps",
+  "main": "index.js"
+}

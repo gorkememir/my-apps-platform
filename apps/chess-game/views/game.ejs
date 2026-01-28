@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Game - Chess</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 70px);
+      grid-template-rows: repeat(8, 70px);
+      margin: 2rem auto;
+      width: fit-content;
+      border: 3px solid #333;
+    }
+    .square {
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .light { background: #f0d9b5; }
+    .dark { background: #b58863; }
+    .selected { background: #7fc97f !important; }
+    .valid-move { background: #90ee90 !important; }
+    h1 { text-align: center; color: #333; }
+    .game-info {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../../packages/ui-components/navbar', { user: user }) %>
+  
+  <div class="container">
+    <h1>♟️ Chess Game #<%= games[0]?.id || 'New' %></h1>
+    
+    <div class="game-info">
+      <p><strong>Turn:</strong> <span id="turn">White</span></p>
+      <p><strong>Status:</strong> <span id="status">In Progress</span></p>
+    </div>
+
+    <div id="board" class="board"></div>
+  </div>
+
+  <script>
+    // Full chess game logic would go here
+    // This is a simplified version
+    const pieces = {
+      'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
+      'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
+    };
+
+    let selectedSquare = null;
+
+    function renderBoard() {
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+      
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const square = document.createElement('div');
+          square.className = 'square ' + ((row + col) % 2 === 0 ? 'light' : 'dark');
+          square.dataset.row = row;
+          square.dataset.col = col;
+          
+          // Initial board setup
+          if (row === 1) square.textContent = pieces['p'];
+          if (row === 6) square.textContent = pieces['P'];
+          if (row === 0) {
+            const backRow = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'];
+            square.textContent = pieces[backRow[col]];
+          }
+          if (row === 7) {
+            const backRow = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
+            square.textContent = pieces[backRow[col]];
+          }
+          
+          square.addEventListener('click', handleSquareClick);
+          board.appendChild(square);
+        }
+      }
+    }
+
+    function handleSquareClick(e) {
+      const square = e.target;
+      
+      if (selectedSquare) {
+        // Move piece
+        if (selectedSquare !== square) {
+          square.textContent = selectedSquare.textContent;
+          selectedSquare.textContent = '';
+        }
+        selectedSquare.classList.remove('selected');
+        selectedSquare = null;
+      } else if (square.textContent) {
+        // Select piece
+        selectedSquare = square;
+        square.classList.add('selected');
+      }
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>

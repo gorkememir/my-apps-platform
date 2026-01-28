@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✓</text></svg>">
+    <style>
+        :root {
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --hover-border: #cbd5e0;
+            --input-focus: #667eea;
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient-start: #1a202c;
+            --bg-gradient-end: #2d3748;
+            --card-bg: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #cbd5e0;
+            --border-color: #4a5568;
+            --hover-border: #718096;
+            --input-focus: #667eea;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start;
+            padding: 20px; 
+            transition: background 0.3s;
+        }
+        
+        .container { max-width: 600px; width: 100%; }
+        
+        .card { 
+            background: var(--card-bg); 
+            padding: 2.5rem; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease-out;
+            transition: background 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: nowrap;
+            gap: 10px;
+        }
+        
+        h2 { 
+            color: var(--text-primary); 
+            font-size: 1.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .theme-toggle, .export-btn, .logout-btn {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .theme-toggle:hover, .export-btn:hover, .logout-btn:hover {
+            border-color: var(--input-focus);
+            transform: scale(1.05);
+        }
+        
+        .user-profile {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            object-fit: cover;
+        }
+        
+        .user-profile:hover {
+            border-color: var(--input-focus);
+            transform: scale(1.1);
+        }
+        
+        .logout-btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .sort-controls {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .sort-btn {
+            padding: 6px 12px;
+            border: 2px solid var(--border-color);
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .sort-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .form-container { margin-bottom: 2rem; }
+        
+        input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            margin-bottom: 12px; 
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-add { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer; 
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-add:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        }
+        
+        ul { list-style: none; padding: 0; }
+        
+        li { 
+            background: linear-gradient(135deg, #f7fafccc 0%, #f7fafcaa 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px; 
+            margin-bottom: 12px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        [data-theme="dark"] li {
+            background: linear-gradient(135deg, #4a5568cc 0%, #4a5568aa 100%);
+        }
+        
+        li:hover {
+            border-color: var(--hover-border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .habit-info strong { 
+            display: block; 
+            color: var(--text-primary); 
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+        
+        .habit-info small { 
+            color: var(--text-secondary); 
+            font-size: 0.8rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .streak { 
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 4px 12px; 
+            border-radius: 20px; 
+            font-size: 0.75rem; 
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+        }
+        
+        .btn-checkin, .btn-undo { 
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+        
+        .btn-undo {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+        }
+        
+        .btn-checkin:hover, .btn-undo:hover { 
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+        
+        .btn-edit, .btn-delete { 
+            background: transparent;
+            color: var(--text-secondary); 
+            border: none; 
+            padding: 8px 10px; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-edit:hover { color: #3b82f6; }
+        .btn-delete:hover { color: #ef4444; }
+        
+        .habit-actions { display: flex; gap: 6px; align-items: center; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .close-modal {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        .history-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .history-item {
+            padding: 8px 12px;
+            background: var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f093fb;
+            animation: confettiFall 1s ease-out forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .calendar-container {
+            margin-top: 2rem;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .calendar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .calendar-nav-btn {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .calendar-nav-btn:hover {
+            border-color: var(--input-focus);
+            transform: scale(1.05);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 8px 4px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 4px;
+            position: relative;
+            min-height: 60px;
+            background: var(--card-bg);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .calendar-day:hover:not(.other-month) {
+            border-color: var(--input-focus);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+        
+        .calendar-day.today {
+            border: 2px solid var(--input-focus);
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+        }
+        
+        .calendar-day-number {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .calendar-dots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            justify-content: center;
+            margin-top: 2px;
+        }
+        
+        .calendar-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+        
+        .habit-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        
+        .reminder-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .reminder-toggle input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        #reminderTimeInput {
+            display: none;
+        }
+        
+        #reminderTimeInput.active {
+            display: block;
+        }
+        
+        /* Mobile responsive styles */
+        @media (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 1.25rem;
+            }
+            
+            .header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+                flex: 0 0 100%;
+                margin-bottom: 8px;
+                white-space: normal;
+            }
+            
+            .controls {
+                gap: 6px;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .theme-toggle, .export-btn, .logout-btn {
+                padding: 6px 10px;
+                font-size: 1rem;
+            }
+            
+            .user-profile {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .stats {
+                gap: 8px;
+            }
+            
+            .stat-card {
+                padding: 10px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .stat-label {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h2>🎯 Habit Tracker</h2>
+                <div class="controls">
+                    <button class="theme-toggle" onclick="toggleCalendar()" title="View calendar">📅</button>
+                    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">🌓</button>
+                    <a href="/export" class="export-btn" title="Download CSV">📥</a>
+                    <% if (user && user.picture) { %>
+                        <img src="<%= user.picture %>" alt="<%= user.name %>" class="user-profile" title="<%= user.name %>" onclick="alert('Profile: <%= user.name %>\nEmail: <%= user.email %>')">
+                    <% } %>
+                    <a href="/logout" class="logout-btn" title="Sign out">➡️</a>
+                </div>
+            </div>
+            
+            <% if (habits.length > 0) { %>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value"><%= stats.completedToday %> / <%= stats.totalHabits %></div>
+                    <div class="stat-label">Completed Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value"><%= stats.totalCompletionsThisWeek %></div>
+                    <div class="stat-label">This Week</div>
+                </div>
+            </div>
+            
+            <div class="sort-controls">
+                <a href="/?sort=newest" class="sort-btn <%= sortBy === 'newest' ? 'active' : '' %>">🆕 Newest</a>
+                <a href="/?sort=oldest" class="sort-btn <%= sortBy === 'oldest' ? 'active' : '' %>">📅 Oldest</a>
+                <a href="/?sort=streak" class="sort-btn <%= sortBy === 'streak' ? 'active' : '' %>">🔥 Streak</a>
+                <a href="/?sort=alphabetical" class="sort-btn <%= sortBy === 'alphabetical' ? 'active' : '' %>">🔤 A-Z</a>
+            </div>
+            <% } %>
+            
+            <div class="form-container">
+                <form action="/add" method="POST" id="addHabitForm">
+                    <input type="text" name="habitName" id="habitNameInput" placeholder="Enter a new habit..." maxlength="100" required>
+                    <label class="reminder-toggle">
+                        <input type="checkbox" id="reminderToggle" onchange="toggleReminderInput()">
+                        <span>Set a reminder time?</span>
+                    </label>
+                    <input type="time" name="reminderTime" id="reminderTimeInput" placeholder="Reminder time">
+                    <button type="submit" class="btn-add">+ Add Habit</button>
+                </form>
+            </div>
+            
+            <div id="calendarView" class="calendar-container" style="display: none;">
+                <div class="calendar-header">
+                    <h3 class="calendar-title" id="calendarTitle">January 2026</h3>
+                    <div class="calendar-nav">
+                        <button class="calendar-nav-btn" onclick="previousMonth()">◀ Prev</button>
+                        <button class="calendar-nav-btn" onclick="currentMonth()">Today</button>
+                        <button class="calendar-nav-btn" onclick="nextMonth()">Next ▶</button>
+                    </div>
+                </div>
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+                </div>
+                <div class="calendar-grid" id="calendarDays" style="margin-top: -8px;">
+                </div>
+                <div class="habit-legend" id="habitLegend"></div>
+            </div>
+
+            <ul id="habitList">
+                <% if (habits.length === 0) { %>
+                    <div class="empty-state">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🎯</div>
+                        <p>No habits yet. Start building better habits today!</p>
+                    </div>
+                <% } %>
+
+                <% habits.forEach(habit => { %>
+                    <li onclick="showHistory(<%= habit.id %>)">
+                        <div class="habit-info">
+                            <strong><%= habit.name %></strong>
+                            <small>📅 Started <%= new Date(habit.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %> • <%= habit.totalCompletions %> completions
+                            <% if (habit.reminderTime) { %>
+                                • ⏰ <%= habit.reminderTime.substring(0, 5) %>
+                            <% } %>
+                            </small>
+                            <% if (habit.streak > 0) { %>
+                                <span class="streak">🔥 <%= habit.streak %> day<%= habit.streak > 1 ? 's' : '' %> streak</span>
+                            <% } %>
+                        </div>
+                        
+                        <div class="habit-actions" onclick="event.stopPropagation()">
+                            <% if (habit.checkedInToday) { %>
+                                <button type="button" class="btn-undo" onclick="undoCheckIn(<%= habit.id %>)">↩️ Undo</button>
+                            <% } else { %>
+                                <button type="button" class="btn-checkin" onclick="checkIn(<%= habit.id %>, event)">✓ Check In</button>
+                            <% } %>
+                            <button class="btn-edit" onclick="editHabit(<%= habit.id %>, '<%= habit.name.replace(/'/g, "\\'") %>', '<%= habit.reminderTime || '' %>')">✏️</button>
+                            <button type="button" class="btn-delete" onclick="deleteHabit(<%= habit.id %>)">🗑️</button>
+                        </div>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; padding: 1rem; color: var(--text-secondary); font-size: 0.75rem; opacity: 0.7;" id="versionInfo">
+            Loading version...
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">History</h3>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <ul class="history-list" id="historyList"></ul>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Habit</h3>
+                <button class="close-modal" onclick="closeEditModal()">×</button>
+            </div>
+            <form id="editForm" method="POST">
+                <input type="text" id="editInput" name="habitName" maxlength="100" required>
+                <label class="reminder-toggle">
+                    <input type="checkbox" id="editReminderToggle" onchange="toggleEditReminderInput()">
+                    <span>Set a reminder time?</span>
+                </label>
+                <input type="time" id="editReminderTime" name="reminderTime">
+                <button type="submit" class="btn-add">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        
+        // Toggle reminder input visibility
+        function toggleReminderInput() {
+            const toggle = document.getElementById('reminderToggle');
+            const input = document.getElementById('reminderTimeInput');
+            input.classList.toggle('active', toggle.checked);
+            if (!toggle.checked) input.value = '';
+        }
+        
+        function toggleEditReminderInput() {
+            const toggle = document.getElementById('editReminderToggle');
+            const input = document.getElementById('editReminderTime');
+            input.classList.toggle('active', toggle.checked);
+            if (!toggle.checked) input.value = '';
+        }
+        
+        // AJAX form submissions
+        async function checkIn(habitId, event) {
+            try {
+                celebrate(event);
+                const response = await fetch(`/checkin/${habitId}`, { method: 'POST' });
+                if (response.ok) {
+                    location.reload();
+                }
+            } catch (err) {
+                console.error('Error checking in:', err);
+                alert('Failed to check in');
+            }
+        }
+        
+        async function undoCheckIn(habitId) {
+            try {
+                const response = await fetch(`/undo/${habitId}`, { method: 'POST' });
+                if (response.ok) {
+                    location.reload();
+                }
+            } catch (err) {
+                console.error('Error undoing check-in:', err);
+                alert('Failed to undo check-in');
+            }
+        }
+        
+        async function deleteHabit(habitId) {
+            if (!confirm('Delete this habit and all its progress?')) return;
+            
+            try {
+                const response = await fetch(`/delete/${habitId}`, { method: 'POST' });
+                if (response.ok) {
+                    location.reload();
+                }
+            } catch (err) {
+                console.error('Error deleting habit:', err);
+                alert('Failed to delete habit');
+            }
+        }
+        
+        // Load version info
+        fetch('/api/version')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('versionInfo').textContent = `${data.commit} • ${data.message}`;
+            })
+            .catch(() => {
+                document.getElementById('versionInfo').textContent = '';
+            });
+        
+        // Notification system
+        let notificationPermission = false;
+        const shownReminders = new Set();
+        
+        // Request notification permission
+        if ('Notification' in window) {
+            Notification.requestPermission().then(permission => {
+                notificationPermission = permission === 'granted';
+            });
+        }
+        
+        // Check for reminders every minute
+        function checkReminders() {
+            fetch('/api/reminders')
+                .then(r => r.json())
+                .then(habits => {
+                    habits.forEach(habit => {
+                        const key = `${habit.id}-${new Date().toDateString()}`;
+                        if (!shownReminders.has(key)) {
+                            shownReminders.add(key);
+                            showReminder(habit);
+                        }
+                    });
+                })
+                .catch(err => console.error('Error checking reminders:', err));
+        }
+        
+        function showReminder(habit) {
+            if (notificationPermission) {
+                new Notification('🎯 Habit Reminder', {
+                    body: `Time to complete: ${habit.name}`,
+                    icon: '/favicon.ico',
+                    badge: '/favicon.ico',
+                    tag: `habit-${habit.id}`
+                });
+            } else {
+                // Fallback to alert if notifications not supported
+                console.log(`Reminder: ${habit.name}`);
+            }
+        }
+        
+        // Check reminders every minute
+        checkReminders();
+        setInterval(checkReminders, 60000);
+
+        // Show history
+        async function showHistory(habitId) {
+            const modal = document.getElementById('historyModal');
+            const list = document.getElementById('historyList');
+            const title = document.getElementById('modalTitle');
+            
+            try {
+                const response = await fetch(`/api/history/${habitId}`);
+                const data = await response.json();
+                
+                title.textContent = `${data.name} - History`;
+                
+                if (data.completions.length === 0) {
+                    list.innerHTML = '<li class="history-item">No completions yet</li>';
+                } else {
+                    list.innerHTML = data.completions.map(date => 
+                        `<li class="history-item">✅ ${new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</li>`
+                    ).join('');
+                }
+                
+                modal.classList.add('active');
+            } catch (err) {
+                alert('Error loading history');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('historyModal').classList.remove('active');
+        }
+
+        // Edit habit
+        function editHabit(id, name, reminderTime) {
+            const modal = document.getElementById('editModal');
+            const form = document.getElementById('editForm');
+            const input = document.getElementById('editInput');
+            const timeInput = document.getElementById('editReminderTime');
+            const toggle = document.getElementById('editReminderToggle');
+            
+            form.action = `/edit/${id}`;
+            input.value = name;
+            timeInput.value = reminderTime || '';
+            toggle.checked = !!reminderTime;
+            timeInput.classList.toggle('active', !!reminderTime);
+            modal.classList.add('active');
+            input.focus();
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // Confetti celebration
+        function celebrate(event) {
+            if (event) event.preventDefault();
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = ['#f093fb', '#f5576c', '#4ade80', '#fbbf24', '#667eea'][Math.floor(Math.random() * 5)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 1000);
+                }, i * 30);
+            }
+        }
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+        
+        // Calendar functionality
+        let currentCalendarDate = new Date();
+        let calendarData = {};
+        
+        async function loadCalendarData(year, month) {
+            try {
+                const response = await fetch(`/api/calendar?year=${year}&month=${month + 1}`);
+                calendarData = await response.json();
+                renderCalendar();
+            } catch (err) {
+                console.error('Error loading calendar data:', err);
+            }
+        }
+        
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            
+            // Update title
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('calendarTitle').textContent = `${monthNames[month]} ${year}`;
+            
+            // Calculate calendar grid
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startDayOfWeek = firstDay.getDay();
+            
+            // Get previous month days
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+            
+            const daysContainer = document.getElementById('calendarDays');
+            daysContainer.innerHTML = '';
+            
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            
+            // Previous month days
+            for (let i = startDayOfWeek - 1; i >= 0; i--) {
+                const day = prevMonthLastDay - i;
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day other-month';
+                dayEl.innerHTML = `<div class="calendar-day-number">${day}</div>`;
+                daysContainer.appendChild(dayEl);
+            }
+            
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+                
+                if (dateStr === todayStr) {
+                    dayEl.classList.add('today');
+                }
+                
+                let html = `<div class="calendar-day-number">${day}</div>`;
+                
+                if (calendarData[dateStr] && calendarData[dateStr].length > 0) {
+                    html += '<div class="calendar-dots">';
+                    calendarData[dateStr].forEach(habit => {
+                        const color = getHabitColor(habit);
+                        html += `<div class="calendar-dot" style="background: ${color}"></div>`;
+                    });
+                    html += '</div>';
+                }
+                
+                dayEl.innerHTML = html;
+                dayEl.title = calendarData[dateStr] ? calendarData[dateStr].join(', ') : 'Click to view';
+                dayEl.onclick = () => showDayDetails(dateStr);
+                daysContainer.appendChild(dayEl);
+            }
+            
+            // Next month days
+            const totalCells = daysContainer.children.length;
+            const remainingCells = 35 - totalCells; // 5 weeks
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day other-month';
+                dayEl.innerHTML = `<div class="calendar-day-number">${day}</div>`;
+                daysContainer.appendChild(dayEl);
+            }
+            
+            // Render legend
+            renderLegend();
+        }
+        
+        function renderLegend() {
+            const legend = document.getElementById('habitLegend');
+            const allHabits = new Set();
+            
+            Object.values(calendarData).forEach(habits => {
+                habits.forEach(habit => allHabits.add(habit));
+            });
+            
+            if (allHabits.size === 0) {
+                legend.innerHTML = '<div class="legend-item" style="color: var(--text-secondary);">No completions this month</div>';
+                return;
+            }
+            
+            legend.innerHTML = Array.from(allHabits).map(habit => {
+                const color = getHabitColor(habit);
+                return `<div class="legend-item"><div class="legend-dot" style="background: ${color}"></div>${habit}</div>`;
+            }).join('');
+        }
+        
+        // Generate consistent colors for habits
+        const habitColors = {};
+        const colorPalette = [
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+            'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+            'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)'
+        ];
+        let colorIndex = 0;
+        
+        function getHabitColor(habitName) {
+            if (!habitColors[habitName]) {
+                habitColors[habitName] = colorPalette[colorIndex % colorPalette.length];
+                colorIndex++;
+            }
+            return habitColors[habitName];
+        }
+        
+        function showDayDetails(dateStr) {
+            const habits = calendarData[dateStr] || [];
+            const modal = document.getElementById('historyModal');
+            const title = document.getElementById('modalTitle');
+            const list = document.getElementById('historyList');
+            
+            const date = new Date(dateStr + 'T00:00:00');
+            title.textContent = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            
+            if (habits.length === 0) {
+                list.innerHTML = '<li class="history-item">No completions on this day</li>';
+            } else {
+                list.innerHTML = habits.map(habit => {
+                    const color = getHabitColor(habit);
+                    return `<li class="history-item"><div class="legend-dot" style="background: ${color}; display: inline-block; margin-right: 8px; vertical-align: middle;"></div>${habit}</li>`;
+                }).join('');
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function toggleCalendar() {
+            const calendarView = document.getElementById('calendarView');
+            const habitList = document.getElementById('habitList');
+            
+            if (calendarView.style.display === 'none') {
+                calendarView.style.display = 'block';
+                habitList.style.display = 'none';
+                loadCalendarData(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            } else {
+                calendarView.style.display = 'none';
+                habitList.style.display = 'block';
+            }
+        }
+        
+        function previousMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            loadCalendarData(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+        }
+        
+        function nextMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            loadCalendarData(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+        }
+        
+        function currentMonth() {
+            currentCalendarDate = new Date();
+            loadCalendarData(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+        }
+    </script>
+</body>
+</html>
