@@ -8,6 +8,7 @@ on:
       - 'packages/**'
       - 'k8s/**'
       - '.github/workflows/deploy.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
