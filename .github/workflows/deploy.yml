@@ -91,7 +91,8 @@ jobs:
       - name: Build and push chess-game
         uses: docker/build-push-action@v4
         with:
-          context: ./apps/chess-game
+          context: .
+          file: ./apps/chess-game/Dockerfile
           push: true
           cache-from: type=registry,ref=gorkememir/chess-game:buildcache
           cache-to: type=registry,ref=gorkememir/chess-game:buildcache,mode=max
