@@ -9,7 +9,6 @@
     "platform-web"
   ],
   "scripts": {
-    "install": "npm install",
     "habit:dev": "npm run start --workspace=apps/habit-tracker",
     "chess:dev": "npm run start --workspace=apps/chess-game",
     "platform:dev": "npm run start --workspace=platform-web",
