@@ -101,4 +101,13 @@ jobs:
           tags: |
             gorkememir/chess-game:latest
             gorkememir/chess-game:${{ github.sha }}
+      
+      - name: Update Kubernetes manifest for chess-game
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B release
+          sed -i "s|image: gorkememir/chess-game:.*|image: gorkememir/chess-game:${{ github.sha }}|g" k8s/chess-app.yml
+          git add k8s/chess-app.yml
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update chess-game image to ${{ github.sha }} (${{ steps.tag_version.outputs.new_tag }})" && git push --force https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/gorkememir/my-apps-platform.git release)
 
