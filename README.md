@@ -1,4 +1,4 @@
-# My Apps Platform
+# My App Platform
 
 A monorepo containing multiple web applications (Habit Tracker, Chess Game) with shared packages for authentication, database, and UI components. Deployed on Kubernetes with GitOps using ArgoCD.
 
