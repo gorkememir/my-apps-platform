@@ -37,8 +37,29 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-app.get('/', (req, res) => {
-  res.render('index', { user: req.user });
+app.get('/', async (req, res) => {
+  if (!req.user) {
+    return res.render('index', { user: null, games: [] });
+  }
+  
+  try {
+    const result = await pool.query(
+      `SELECT g.*, 
+              u1.name as white_player_name, 
+              u2.name as black_player_name
+       FROM chess_games g
+       LEFT JOIN users u1 ON g.white_player_id = u1.id
+       LEFT JOIN users u2 ON g.black_player_id = u2.id
+       WHERE (g.white_player_id = $1 OR g.black_player_id = $1)
+         AND g.status = 'active'
+       ORDER BY g.updated_at DESC`,
+      [req.user.id]
+    );
+    res.render('index', { user: req.user, games: result.rows });
+  } catch (err) {
+    console.error('Error fetching games:', err);
+    res.render('index', { user: req.user, games: [] });
+  }
 });
 
 app.get('/login', (req, res) => {
