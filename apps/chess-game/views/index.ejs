@@ -60,7 +60,21 @@
   </style>
 </head>
 <body>
-  <%- include('../../../packages/ui-components/navbar', { user: user }) %>
+  <nav style="background: #333; padding: 1rem; margin-bottom: 2rem;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; gap: 2rem; align-items: center;">
+        <a href="/" style="color: white; text-decoration: none; font-weight: bold; font-size: 1.2rem;">♟️ Chess Game</a>
+      </div>
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <% if (user) { %>
+          <span style="color: white;"><%= user.name %></span>
+          <a href="/logout" style="color: white; text-decoration: none;">Logout</a>
+        <% } else { %>
+          <a href="/login" style="color: white; text-decoration: none;">Login</a>
+        <% } %>
+      </div>
+    </div>
+  </nav>
   
   <div class="container">
     <h1>♟️ Chess Game</h1>
