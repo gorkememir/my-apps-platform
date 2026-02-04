@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: chess-app
-        image: gorkememir/chess-game:latest
+        image: gorkememir/chess-game:613c27c0e98fc5119ec0d613e57c92e1a42f7f27
         imagePullPolicy: Always
         ports:
         - containerPort: 3001
